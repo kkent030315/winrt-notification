@@ -1,8 +1,8 @@
 #[cfg(target_env = "msvc")]
 mod internal {
     #[link(name = "ntdll")]
-    extern "system" {
-        pub fn RtlGetNtVersionNumbers(major: *mut u32, minor: *mut u32, build: *mut u32);
+    unsafe extern "system" {
+        pub unsafe fn RtlGetNtVersionNumbers(major: *mut u32, minor: *mut u32, build: *mut u32);
     }
 }
 
@@ -10,7 +10,10 @@ mod internal {
 // but we know it's in ntdll which will always be present at runtime.
 #[cfg(target_env = "gnu")]
 mod internal {
-    use windows::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};
+    use windows::Win32::System::LibraryLoader::{
+        GetModuleHandleA,
+        GetProcAddress,
+    };
 
     #[allow(non_upper_case_globals)]
     static mut CacheRtlGetNtVersionNumbers: Option<unsafe extern "system" fn() -> isize> = None;
